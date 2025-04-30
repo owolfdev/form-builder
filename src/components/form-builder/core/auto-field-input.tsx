@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { type ZodTypeAny, ZodString, ZodNumber, ZodBoolean } from "zod";
-import { fieldRegistry } from "@/components/forms/field-registry";
+import { fieldRegistry } from "@/components/form-builder/core/field-registry";
 
 interface AutoFieldInputProps<T extends FieldValues> {
   name: Path<T>; // more precise typing!

@@ -1,8 +1,8 @@
 "use client";
 
-import { GenericForm } from "@/components/form-builder/core/generic-form";
-import { PersonSchema } from "@/components/form-builder/config/person-form-config";
-import { createPerson } from "@/components/form-builder/actions/person/create-person";
+import { GenericForm } from "@/components/forms/generic-form";
+import { PersonSchema } from "@/schemas/person-schema";
+import { createPerson } from "@/actions/person/create-person";
 
 export default function CreatePersonPage() {
   return (

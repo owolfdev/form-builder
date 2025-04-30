@@ -7,7 +7,7 @@ import { useForm, type DefaultValues, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ZodObject, ZodRawShape, TypeOf } from "zod";
 import { Form } from "@/components/ui/form";
-import AutoFieldInput from "@/components/forms/auto-field-input";
+import AutoFieldInput from "@/components/form-builder/core/auto-field-input";
 
 interface GenericFormProps<T extends ZodObject<ZodRawShape>> {
   schema: T;
