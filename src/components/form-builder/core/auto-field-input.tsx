@@ -1,5 +1,3 @@
-// src/components/forms/auto-field-input.tsx
-
 "use client";
 
 import type { Control, FieldValues, Path } from "react-hook-form";
@@ -13,11 +11,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { type ZodTypeAny, ZodString, ZodNumber, ZodBoolean } from "zod";
+import {
+  ZodString,
+  ZodNumber,
+  ZodBoolean,
+  ZodOptional,
+  type ZodTypeAny,
+} from "zod";
 import { fieldRegistry } from "@/components/form-builder/core/field-registry";
 
 interface AutoFieldInputProps<T extends FieldValues> {
-  name: Path<T>; // more precise typing!
+  name: Path<T>;
   control: Control<T>;
   schema: ZodTypeAny;
 }
@@ -54,12 +58,18 @@ export default function AutoFieldInput<T extends FieldValues>({
       render={({ field }) => (
         <FormItem>
           <FormLabel>{formatLabel(name.toString())}</FormLabel>
-          <FormControl>{renderInputByType(schema, field)}</FormControl>
+          <FormControl>
+            {renderInputByType(unwrapSchema(schema), field)}
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}
     />
   );
+}
+
+function unwrapSchema(schema: ZodTypeAny): ZodTypeAny {
+  return schema instanceof ZodOptional ? schema._def.innerType : schema;
 }
 
 function renderInputByType(
@@ -87,6 +97,7 @@ function renderInputByType(
       />
     );
   }
+
   if (schema instanceof ZodNumber) {
     return (
       <Input
@@ -101,11 +112,13 @@ function renderInputByType(
       />
     );
   }
+
   if (schema instanceof ZodBoolean) {
     return (
       <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
     );
   }
+
   return (
     <Input
       placeholder={`Enter ${field.name}`}
