@@ -10,6 +10,8 @@ interface FieldConfig {
   name: string;
   label?: string;
   type?: string;
+  bucket?: string;
+  multi?: boolean;
 }
 
 interface GenericFormProps<T extends ZodObject<ZodRawShape>> {
@@ -17,6 +19,8 @@ interface GenericFormProps<T extends ZodObject<ZodRawShape>> {
   fields: FieldConfig[];
   defaultValues?: DefaultValues<TypeOf<T>>;
   onSubmit: (values: TypeOf<T>) => Promise<void> | void;
+  bucket?: string;
+  multi?: boolean;
 }
 
 export function GenericForm<T extends ZodObject<ZodRawShape>>({
@@ -38,14 +42,16 @@ export function GenericForm<T extends ZodObject<ZodRawShape>>({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {fields.map(({ name, type, label }) => (
+        {fields.map((field) => (
           <AutoFieldInput<TypeOf<T>>
-            key={name}
-            name={name as Path<TypeOf<T>>}
+            key={field.name}
+            name={field.name as Path<TypeOf<T>>}
             control={form.control}
-            schema={schema.shape[name]}
-            fieldType={type}
-            label={label}
+            schema={schema.shape[field.name]}
+            fieldType={field.type}
+            label={field.label}
+            bucket={field.bucket} // ✅ field-specific bucket
+            multi={field.multi} // ✅ field-specific multi
           />
         ))}
 

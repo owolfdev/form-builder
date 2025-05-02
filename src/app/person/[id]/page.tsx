@@ -2,24 +2,32 @@ import { notFound } from "next/navigation";
 import { getRecord } from "@/components/form-builder/actions/get-record";
 import { personConfig, type PersonRecord } from "../config/form-config";
 import Link from "next/link";
+import ImageViewer from "@/components/images/image-viewer";
 
 interface PersonPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function PersonPage({ params }: PersonPageProps) {
-  const person = await getRecord<PersonRecord>(personConfig, params.id);
+  const { id } = await params;
+
+  const person = await getRecord<PersonRecord>(personConfig, id);
 
   if (!person) return notFound();
 
+  const photoUrls = Array.isArray(person.images)
+    ? person.images.map((img) => img.url)
+    : [];
+
   return (
-    <div className="max-w-2xl mx-auto py-10">
-      <div className="mb-8">
+    <div className="max-w-2xl mx-auto py-10 space-y-6">
+      <div className="mb-4">
         <Link href="/person">{"<--"} Back to All Persons</Link>
       </div>
-      <h1 className="text-4xl font-bold mb-8">{person.name}</h1>
+
+      <ImageViewer photoUrls={photoUrls} height={300} url={`/person/${id}`} />
+
+      <h1 className="text-4xl font-bold">{person.name}</h1>
       <ul className="space-y-4 text-lg">
         <li>
           <strong>Email:</strong> {person.email || "N/A"}

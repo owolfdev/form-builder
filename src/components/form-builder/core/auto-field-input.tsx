@@ -10,9 +10,6 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import {
   ZodString,
   ZodNumber,
@@ -22,12 +19,24 @@ import {
 } from "zod";
 import { fieldRegistry } from "@/components/form-builder/core/field-registry";
 
+// components
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+
+// custom components
+import { SbImageUploader } from "@/components/form-builder/custom-fields";
+import type { UploadedPhoto } from "@/components/form-builder/custom-fields/sb-image-uploader";
+
 interface AutoFieldInputProps<T extends FieldValues> {
   name: Path<T>;
   control: Control<T>;
   schema: ZodTypeAny;
   label?: string;
   fieldType?: string;
+  bucket?: string;
+  multi?: boolean;
 }
 
 export default function AutoFieldInput<T extends FieldValues>({
@@ -36,6 +45,8 @@ export default function AutoFieldInput<T extends FieldValues>({
   schema,
   label,
   fieldType,
+  bucket,
+  multi,
 }: AutoFieldInputProps<T>) {
   const RegisteredComponent = fieldRegistry[name as string];
 
@@ -65,7 +76,13 @@ export default function AutoFieldInput<T extends FieldValues>({
         <FormItem>
           <FormLabel>{label ?? formatLabel(name.toString())}</FormLabel>
           <FormControl>
-            {renderInputByType(unwrapSchema(schema), field, fieldType)}
+            {renderInputByType(
+              unwrapSchema(schema),
+              field,
+              fieldType,
+              bucket,
+              multi
+            )}
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -81,7 +98,9 @@ function unwrapSchema(schema: ZodTypeAny): ZodTypeAny {
 function renderInputByType(
   schema: ZodTypeAny,
   field: { name: string; value: unknown; onChange: (value: unknown) => void },
-  fieldType?: string
+  fieldType?: string,
+  bucket?: string,
+  multi?: boolean
 ) {
   if (schema instanceof ZodString) {
     const isLongText =
@@ -125,11 +144,10 @@ function renderInputByType(
     return fieldType === "checkbox" ? (
       // checkbox input
       <div className="flex items-center justify-start">
-        <input
+        <Checkbox
           id={field.name}
-          type="checkbox"
           checked={Boolean(field.value)}
-          onChange={(e) => field.onChange(e.target.checked)}
+          onCheckedChange={field.onChange}
           className="w-4 h-4"
         />
       </div>
@@ -141,6 +159,24 @@ function renderInputByType(
           onCheckedChange={field.onChange}
         />
       </div>
+    );
+  }
+
+  if (fieldType?.startsWith("image")) {
+    const isMulti = multi ?? fieldType === "image-multi";
+
+    return (
+      <SbImageUploader
+        name={field.name}
+        value={
+          isMulti
+            ? ((field.value ?? []) as UploadedPhoto[])
+            : ((field.value ?? "") as string)
+        }
+        onChange={field.onChange as (value: UploadedPhoto[] | string) => void}
+        bucket={bucket ?? "default-bucket"}
+        multi={isMulti}
+      />
     );
   }
 

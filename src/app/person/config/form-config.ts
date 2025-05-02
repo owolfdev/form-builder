@@ -6,6 +6,14 @@ export const PersonSchema = z.object({
   phone: z.string().optional(),
   bio: z.string().optional(),
   active: z.boolean().optional(),
+  images: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        caption: z.string().optional(),
+      })
+    )
+    .optional(), // <-- This makes the entire "images" field optional
 });
 
 export type PersonType = z.infer<typeof PersonSchema>;
@@ -21,7 +29,13 @@ export const personFields = [
   { name: "email", label: "Email", type: "text" },
   { name: "phone", label: "Phone", type: "text" },
   { name: "bio", label: "Bio", type: "textarea" },
-  { name: "active", label: "Active", type: "switch" },
+  { name: "active", label: "Active", type: "checkbox" },
+  {
+    name: "images",
+    label: "Images",
+    type: "image-multi",
+    bucket: "person-images",
+  },
 ];
 
 // person-form-config.ts
