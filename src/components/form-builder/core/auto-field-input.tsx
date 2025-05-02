@@ -1,3 +1,5 @@
+// src/components/form-builder/core/auto-field-input.tsx
+
 "use client";
 
 import type { Control, FieldValues, Path } from "react-hook-form";
@@ -24,12 +26,16 @@ interface AutoFieldInputProps<T extends FieldValues> {
   name: Path<T>;
   control: Control<T>;
   schema: ZodTypeAny;
+  label?: string;
+  fieldType?: string;
 }
 
 export default function AutoFieldInput<T extends FieldValues>({
   name,
   control,
   schema,
+  label,
+  fieldType,
 }: AutoFieldInputProps<T>) {
   const RegisteredComponent = fieldRegistry[name as string];
 
@@ -40,7 +46,7 @@ export default function AutoFieldInput<T extends FieldValues>({
         name={name}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{formatLabel(name.toString())}</FormLabel>
+            <FormLabel>{label ?? formatLabel(name.toString())}</FormLabel>
             <FormControl>
               <RegisteredComponent {...field} />
             </FormControl>
@@ -57,9 +63,9 @@ export default function AutoFieldInput<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{formatLabel(name.toString())}</FormLabel>
+          <FormLabel>{label ?? formatLabel(name.toString())}</FormLabel>
           <FormControl>
-            {renderInputByType(unwrapSchema(schema), field)}
+            {renderInputByType(unwrapSchema(schema), field, fieldType)}
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -74,12 +80,14 @@ function unwrapSchema(schema: ZodTypeAny): ZodTypeAny {
 
 function renderInputByType(
   schema: ZodTypeAny,
-  field: { name: string; value: unknown; onChange: (value: unknown) => void }
+  field: { name: string; value: unknown; onChange: (value: unknown) => void },
+  fieldType?: string
 ) {
   if (schema instanceof ZodString) {
     const isLongText =
       field.name.toLowerCase().includes("description") ||
-      field.name.toLowerCase().includes("bio");
+      field.name.toLowerCase().includes("bio") ||
+      fieldType === "textarea";
     return isLongText ? (
       <Textarea
         placeholder={`Enter ${field.name}`}
@@ -114,8 +122,25 @@ function renderInputByType(
   }
 
   if (schema instanceof ZodBoolean) {
-    return (
-      <Switch checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+    return fieldType === "checkbox" ? (
+      // checkbox input
+      <div className="flex items-center justify-start">
+        <input
+          id={field.name}
+          type="checkbox"
+          checked={Boolean(field.value)}
+          onChange={(e) => field.onChange(e.target.checked)}
+          className="w-4 h-4"
+        />
+      </div>
+    ) : (
+      <div>
+        <Switch
+          id={field.name}
+          checked={Boolean(field.value)}
+          onCheckedChange={field.onChange}
+        />
+      </div>
     );
   }
 

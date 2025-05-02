@@ -1,22 +1,27 @@
-// src/components/forms/generic-form.tsx
-
 "use client";
 
 import { useForm, type DefaultValues, type Path } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ZodObject, ZodRawShape, TypeOf } from "zod";
 import { Form } from "@/components/ui/form";
 import AutoFieldInput from "@/components/form-builder/core/auto-field-input";
 
+interface FieldConfig {
+  name: string;
+  label?: string;
+  type?: string;
+}
+
 interface GenericFormProps<T extends ZodObject<ZodRawShape>> {
   schema: T;
+  fields: FieldConfig[];
   defaultValues?: DefaultValues<TypeOf<T>>;
   onSubmit: (values: TypeOf<T>) => Promise<void> | void;
 }
 
 export function GenericForm<T extends ZodObject<ZodRawShape>>({
   schema,
+  fields,
   defaultValues,
   onSubmit,
 }: GenericFormProps<T>) {
@@ -25,15 +30,22 @@ export function GenericForm<T extends ZodObject<ZodRawShape>>({
     defaultValues,
   });
 
+  if (!fields || !Array.isArray(fields)) {
+    console.warn("⚠️ GenericForm: 'fields' prop is missing or not an array");
+    return <p className="text-red-500">Missing form field configuration.</p>;
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {Object.keys(schema.shape).map((fieldName) => (
+        {fields.map(({ name, type, label }) => (
           <AutoFieldInput<TypeOf<T>>
-            key={fieldName}
-            name={fieldName as Path<TypeOf<T>>}
+            key={name}
+            name={name as Path<TypeOf<T>>}
             control={form.control}
-            schema={schema.shape[fieldName]}
+            schema={schema.shape[name]}
+            fieldType={type}
+            label={label}
           />
         ))}
 

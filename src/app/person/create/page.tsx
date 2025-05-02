@@ -1,22 +1,34 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { GenericForm } from "@/components/form-builder/core/generic-form";
-import { PersonSchema } from "@/components/form-builder/config/person-form-config";
-import { createPerson } from "@/components/form-builder/actions/person/create-person";
+import { createRecord } from "@/components/form-builder/actions/create-record";
+import {
+  personConfig,
+  PersonSchema,
+  personFields,
+} from "../config/form-config";
+
+import type { PersonRecord } from "../config/form-config";
 
 export default function CreatePersonPage() {
+  const router = useRouter();
+
   return (
     <div className="max-w-2xl mx-auto py-10">
       <h1 className="text-4xl font-bold mb-8">Create Person</h1>
       <GenericForm
         schema={PersonSchema}
+        fields={personFields}
         onSubmit={async (values) => {
           try {
-            const newPerson = await createPerson(values);
-            console.log("Success:", newPerson);
-            // TODO: Show success toast or redirect
+            const newPerson = await createRecord<PersonRecord>(
+              personConfig,
+              values
+            );
+            router.push(`/person/${newPerson.id}`);
           } catch (error) {
-            console.error("Failed to create person:", error);
+            console.error("❌ Failed to create person:", error);
           }
         }}
       />
