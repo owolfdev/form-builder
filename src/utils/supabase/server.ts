@@ -1,3 +1,5 @@
+// src/utils/supabase/server.ts
+
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -18,9 +20,8 @@ export const createClient = async () => {
               cookieStore.set(name, value, options);
             }
           } catch (error) {
-            // The `set` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Ignored: `set` was likely called from a Server Component.
+            console.error(error);
           }
         },
       },
