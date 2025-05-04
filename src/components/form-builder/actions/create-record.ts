@@ -9,14 +9,21 @@ interface CreateRecordConfig {
 
 export async function createRecord<T extends { id: string }>(
   config: CreateRecordConfig,
-  values: unknown
+  values: {
+    tags?: string[];
+    categories?: string[];
+    [key: string]: unknown;
+  }
 ): Promise<T> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { tags, categories, ...baseValues } = values;
+
+  // Step 1: Insert person
+  const { data: person, error } = await supabase
     .from(config.table)
-    .insert([values])
-    .select("*") // include `id` in response
+    .insert([baseValues])
+    .select("*")
     .single();
 
   if (error) {
@@ -24,5 +31,27 @@ export async function createRecord<T extends { id: string }>(
     throw new Error("Failed to create record.");
   }
 
-  return data as T;
+  const personId = person.id;
+
+  // Step 2: Insert tag relationships
+  if (Array.isArray(tags) && tags.length > 0) {
+    await supabase.from("form_builder_person_tags").insert(
+      tags.map((tagId: string) => ({
+        person_id: personId,
+        tag_id: Number(tagId),
+      }))
+    );
+  }
+
+  // Step 3: Insert category relationships
+  if (Array.isArray(categories) && categories.length > 0) {
+    await supabase.from("form_builder_person_categories").insert(
+      categories.map((categoryId: string) => ({
+        person_id: personId,
+        category_id: Number(categoryId),
+      }))
+    );
+  }
+
+  return person as T;
 }

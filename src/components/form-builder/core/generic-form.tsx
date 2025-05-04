@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, type DefaultValues, type Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ZodObject, ZodRawShape, TypeOf } from "zod";
 import { Form } from "@/components/ui/form";
 import AutoFieldInput from "@/components/form-builder/core/auto-field-input";
+import type { PersonType } from "@/app/person/config/form-config";
 
 interface FieldConfig {
   name: string;
@@ -12,6 +14,7 @@ interface FieldConfig {
   type?: string;
   bucket?: string;
   multi?: boolean;
+  options?: { id: string; name: string }[]; // ✅ ADD THIS
 }
 
 interface GenericFormProps<T extends ZodObject<ZodRawShape>> {
@@ -23,6 +26,17 @@ interface GenericFormProps<T extends ZodObject<ZodRawShape>> {
   multi?: boolean;
 }
 
+export const getDefaultPersonValues = (): DefaultValues<PersonType> => ({
+  name: "",
+  email: "",
+  phone: "",
+  bio: "",
+  active: false,
+  tags: [],
+  categories: [],
+  images: [],
+});
+
 export function GenericForm<T extends ZodObject<ZodRawShape>>({
   schema,
   fields,
@@ -31,13 +45,23 @@ export function GenericForm<T extends ZodObject<ZodRawShape>>({
 }: GenericFormProps<T>) {
   const form = useForm<TypeOf<T>>({
     resolver: zodResolver(schema),
-    defaultValues,
+    defaultValues:
+      (defaultValues as DefaultValues<TypeOf<T>>) ??
+      (getDefaultPersonValues() as DefaultValues<TypeOf<T>>),
   });
 
   if (!fields || !Array.isArray(fields)) {
     console.warn("⚠️ GenericForm: 'fields' prop is missing or not an array");
     return <p className="text-red-500">Missing form field configuration.</p>;
   }
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      console.log("📦 Live form values:", values);
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   return (
     <Form {...form}>
@@ -50,8 +74,9 @@ export function GenericForm<T extends ZodObject<ZodRawShape>>({
             schema={schema.shape[field.name]}
             fieldType={field.type}
             label={field.label}
-            bucket={field.bucket} // ✅ field-specific bucket
-            multi={field.multi} // ✅ field-specific multi
+            bucket={field.bucket}
+            multi={field.multi}
+            options={field.options} // ✅ add this line!
           />
         ))}
 

@@ -19,14 +19,15 @@ import {
 } from "zod";
 import { fieldRegistry } from "@/components/form-builder/core/field-registry";
 
-// components
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 
-// custom components
-import { SbImageUploader } from "@/components/form-builder/custom-fields";
+import {
+  SbImageUploader,
+  MultiSelect,
+} from "@/components/form-builder/custom-fields";
 import type { UploadedPhoto } from "@/components/form-builder/custom-fields/sb-image-uploader";
 
 interface AutoFieldInputProps<T extends FieldValues> {
@@ -37,6 +38,7 @@ interface AutoFieldInputProps<T extends FieldValues> {
   fieldType?: string;
   bucket?: string;
   multi?: boolean;
+  options?: { id: string; name: string }[];
 }
 
 export default function AutoFieldInput<T extends FieldValues>({
@@ -47,6 +49,7 @@ export default function AutoFieldInput<T extends FieldValues>({
   fieldType,
   bucket,
   multi,
+  options,
 }: AutoFieldInputProps<T>) {
   const RegisteredComponent = fieldRegistry[name as string];
 
@@ -81,7 +84,8 @@ export default function AutoFieldInput<T extends FieldValues>({
               field,
               fieldType,
               bucket,
-              multi
+              multi,
+              options
             )}
           </FormControl>
           <FormMessage />
@@ -100,8 +104,19 @@ function renderInputByType(
   field: { name: string; value: unknown; onChange: (value: unknown) => void },
   fieldType?: string,
   bucket?: string,
-  multi?: boolean
+  multi?: boolean,
+  options?: { id: string; name: string }[]
 ) {
+  if (fieldType === "multi-select" && Array.isArray(options)) {
+    return (
+      <MultiSelect
+        value={(field.value ?? []) as string[]}
+        onChange={field.onChange as (value: string[]) => void}
+        options={options}
+      />
+    );
+  }
+
   if (schema instanceof ZodString) {
     const isLongText =
       field.name.toLowerCase().includes("description") ||
@@ -142,7 +157,6 @@ function renderInputByType(
 
   if (schema instanceof ZodBoolean) {
     return fieldType === "checkbox" ? (
-      // checkbox input
       <div className="flex items-center justify-start">
         <Checkbox
           id={field.name}
