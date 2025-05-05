@@ -2,11 +2,12 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { tagStoreTable } from "@/app/person/config/form-config"; // ✅ import from config
 
 export async function getTagOptions() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("form_builder_person_tag_store")
+    .from(tagStoreTable)
     .select("id, name")
     .order("name", { ascending: true });
 

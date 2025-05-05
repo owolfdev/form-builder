@@ -2,11 +2,12 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { categoryStoreTable } from "@/app/person/config/form-config"; // ✅
 
 export async function getCategoryOptions() {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("form_builder_person_category_store")
+    .from(categoryStoreTable)
     .select("id, name")
     .order("name", { ascending: true });
 

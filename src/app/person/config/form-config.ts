@@ -60,6 +60,9 @@ export const personFields = [
   },
 ];
 
+export const categoryStoreTable = "form_builder_person_category_store";
+export const tagStoreTable = "form_builder_person_tag_store";
+
 // person-form-config.ts
 export const personConfig = {
   schema: PersonSchema,
