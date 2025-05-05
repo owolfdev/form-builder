@@ -1,3 +1,123 @@
+## 🧭 Form Builder System Overview
+
+### 1. 🧠 **Entity Config (e.g. Person)**
+
+**File:** `/app/person/config/form-config.ts`
+
+Defines the **contract** and metadata for a form:
+
+- `schema`: Zod object for validation
+- `fields`: list of field configs (`type`, `label`, `optionsLoader`)
+- `table`: Supabase table to insert into
+- `columns`, `displayFields`: optional metadata for listing/display
+- `tagStoreTable`, `categoryStoreTable`: optional dynamic lookups
+
+> ✅ This allows DynamicForm and backend actions to work **without hardcoding entity specifics**.
+
+---
+
+### 2. 🧩 **DynamicForm Component**
+
+**File:** `/components/form-builder/core/dynamic-form.tsx`
+
+Fully reusable client-side form powered by:
+
+- `react-hook-form` + `zodResolver`
+- Accepts any schema + field definitions
+- Dynamically renders input fields via `AutoFieldInput`
+- Submits values via passed `onSubmit()` handler
+
+> ✅ Used by all `create`/`edit` pages for any entity.
+
+---
+
+### 3. ⚙️ **Supabase Actions**
+
+**Files:** `/components/form-builder/actions/*.ts`
+
+Reusable server-side logic:
+
+| File                      | Purpose                                                      |
+| ------------------------- | ------------------------------------------------------------ |
+| `create-record.ts`        | Inserts into main table + related tags/categories via config |
+| `get-tag-options.ts`      | Dynamically fetches tag options from config-defined table    |
+| `get-category-options.ts` | Same, but for categories                                     |
+| `get-record.ts`           | Fetches a single entity by ID                                |
+| `get-all-records.ts`      | List all entities of given table                             |
+
+> ✅ All these use a **shared config object** per entity to stay flexible and DRY.
+
+---
+
+### 4. 🧱 **Field Input Renderer**
+
+**File:** `/components/form-builder/core/auto-field-input.tsx`
+
+Handles how each field is rendered:
+
+- Maps `type: "text" | "checkbox" | "multi-select" | "image-multi"` → correct component
+- Injects field options, labels, etc.
+
+> ✅ Keeps `DynamicForm` logic clean and scalable.
+
+---
+
+### 5. 🧑‍💼 **Person Implementation**
+
+**Structure:**
+
+```
+/app/person
+├── config/form-config.ts      <-- defines schema, fields, table
+├── create/client-form.tsx     <-- uses DynamicForm + personConfig
+├── [id]/page.tsx              <-- detail/edit page
+├── page.tsx                   <-- list or landing
+```
+
+> ✅ Easy to replicate for other entities (e.g. `/company`, `/project`).
+
+---
+
+### 🔄 Data Flow
+
+```mermaid
+graph TD
+  subgraph Client
+    A[DynamicForm] --> B[AutoFieldInput]
+    A -->|onSubmit| C[createRecord]
+  end
+
+  subgraph Server
+    C -->|insert| D[Supabase Table]
+    C -->|tag/cat insert| E[Relation Tables]
+    B -->|load options| F[getTagOptions/getCategoryOptions]
+    F --> G[Tag/Category Store Tables]
+  end
+
+  style D fill:#fffacd
+  style E fill:#ffe4e1
+```
+
+---
+
+### ✅ Summary
+
+| Feature                | Status            |
+| ---------------------- | ----------------- |
+| Dynamic schemas        | ✅ using Zod      |
+| Config-driven fields   | ✅ with `fields`  |
+| Relation config        | ✅ via tags/cats  |
+| Dynamic form rendering | ✅ `DynamicForm`  |
+| Supabase inserts       | ✅ `createRecord` |
+| Option fetching        | ✅ config-aware   |
+
+---
+
+**Would you like a `makeEntityConfig()` factory to eliminate repetition across entities?**
+Or want a scaffold generator for new entity folders?
+
+---
+
 we are creating a sort of dynamic form system. let me give you an overview so you clearly understand, reason being is that we will create a custom multi select component that will use either categories or tags we want to make sure everything is compatible and best practice:
 
 # Next.js Form Builder with Supabase
