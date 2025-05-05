@@ -3,8 +3,16 @@
 
 import { createClient } from "@/utils/supabase/server";
 
+interface RelationConfig {
+  table: string;
+  sourceKey: string; // e.g. 'entity_id'
+  targetKey: string; // e.g. 'tag_id' or 'category_id'
+}
+
 interface CreateRecordConfig {
   table: string;
+  tagRelation?: RelationConfig;
+  categoryRelation?: RelationConfig;
 }
 
 export async function createRecord<T extends { id: string }>(
@@ -19,8 +27,7 @@ export async function createRecord<T extends { id: string }>(
 
   const { tags, categories, ...baseValues } = values;
 
-  // Step 1: Insert person
-  const { data: person, error } = await supabase
+  const { data: record, error } = await supabase
     .from(config.table)
     .insert([baseValues])
     .select("*")
@@ -31,27 +38,31 @@ export async function createRecord<T extends { id: string }>(
     throw new Error("Failed to create record.");
   }
 
-  const personId = person.id;
+  const recordId = record.id;
 
-  // Step 2: Insert tag relationships
-  if (Array.isArray(tags) && tags.length > 0) {
-    await supabase.from("form_builder_person_tags").insert(
+  if (Array.isArray(tags) && tags.length > 0 && config.tagRelation) {
+    const { table, sourceKey, targetKey } = config.tagRelation;
+    await supabase.from(table).insert(
       tags.map((tagId: string) => ({
-        person_id: personId,
-        tag_id: Number(tagId),
+        [sourceKey]: recordId,
+        [targetKey]: Number(tagId),
       }))
     );
   }
 
-  // Step 3: Insert category relationships
-  if (Array.isArray(categories) && categories.length > 0) {
-    await supabase.from("form_builder_person_categories").insert(
+  if (
+    Array.isArray(categories) &&
+    categories.length > 0 &&
+    config.categoryRelation
+  ) {
+    const { table, sourceKey, targetKey } = config.categoryRelation;
+    await supabase.from(table).insert(
       categories.map((categoryId: string) => ({
-        person_id: personId,
-        category_id: Number(categoryId),
+        [sourceKey]: recordId,
+        [targetKey]: Number(categoryId),
       }))
     );
   }
 
-  return person as T;
+  return record as T;
 }
