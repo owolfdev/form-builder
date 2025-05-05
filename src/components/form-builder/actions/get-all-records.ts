@@ -5,11 +5,11 @@ interface Config {
   select?: string;
 }
 
-type GenericStringError = { message: string };
+type ErrorMessage = { message: string };
 
 export async function getAllRecords<T>(
   config: Config
-): Promise<T[] | GenericStringError[]> {
+): Promise<T[] | ErrorMessage[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -22,5 +22,5 @@ export async function getAllRecords<T>(
     return [{ message: error.message }];
   }
 
-  return (data ?? []) as T[] | GenericStringError[];
+  return (data ?? []) as T[];
 }

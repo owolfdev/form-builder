@@ -187,7 +187,7 @@ src/app/person/create/page.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
-import { GenericForm } from "@/components/form-builder/core/generic-form";
+import { DynamicForm } from "@/components/form-builder/core/dynamic-form";
 import { createRecord } from "@/components/form-builder/actions/create-record";
 import {
 personConfig,
@@ -201,7 +201,7 @@ export default function CreatePersonPage() {
 const router = useRouter();
 
 return ( <div className="max-w-2xl mx-auto py-10"> <h1 className="text-4xl font-bold mb-8">Create Person</h1>
-\<GenericForm
+\<DynamicForm
 schema={PersonSchema}
 fields={personFields}
 onSubmit={async (values) => {
