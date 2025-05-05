@@ -14,10 +14,10 @@ interface FieldConfig {
   type?: string;
   bucket?: string;
   multi?: boolean;
-  options?: { id: string; name: string }[]; // ✅ ADD THIS
+  options?: { id: string; name: string }[];
 }
 
-interface GenericFormProps<T extends ZodObject<ZodRawShape>> {
+interface DynamicFormProps<T extends ZodObject<ZodRawShape>> {
   schema: T;
   fields: FieldConfig[];
   defaultValues?: DefaultValues<TypeOf<T>>;
@@ -37,12 +37,12 @@ export const getDefaultPersonValues = (): DefaultValues<PersonType> => ({
   images: [],
 });
 
-export function GenericForm<T extends ZodObject<ZodRawShape>>({
+export function DynamicForm<T extends ZodObject<ZodRawShape>>({
   schema,
   fields,
   defaultValues,
   onSubmit,
-}: GenericFormProps<T>) {
+}: DynamicFormProps<T>) {
   const form = useForm<TypeOf<T>>({
     resolver: zodResolver(schema),
     defaultValues:
@@ -51,7 +51,7 @@ export function GenericForm<T extends ZodObject<ZodRawShape>>({
   });
 
   if (!fields || !Array.isArray(fields)) {
-    console.warn("⚠️ GenericForm: 'fields' prop is missing or not an array");
+    console.warn("⚠️ DynamicForm: 'fields' prop is missing or not an array");
     return <p className="text-red-500">Missing form field configuration.</p>;
   }
 
@@ -76,7 +76,7 @@ export function GenericForm<T extends ZodObject<ZodRawShape>>({
             label={field.label}
             bucket={field.bucket}
             multi={field.multi}
-            options={field.options} // ✅ add this line!
+            options={field.options}
           />
         ))}
 

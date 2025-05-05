@@ -2,7 +2,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { GenericForm } from "@/components/form-builder/core/generic-form";
+import { DynamicForm } from "@/components/form-builder/core/dynamic-form";
 import { createRecord } from "@/components/form-builder/actions/create-record";
 import { PersonSchema, personConfig } from "../config/form-config";
 import type { PersonRecord } from "../config/form-config";
@@ -18,7 +18,7 @@ export default function CreatePersonClientForm({ fields }: Props) {
   return (
     <div className="max-w-2xl mx-auto py-10">
       <h1 className="text-4xl font-bold mb-8">Create Person</h1>
-      <GenericForm
+      <DynamicForm
         schema={PersonSchema}
         fields={fields}
         onSubmit={async (values) => {

@@ -37,7 +37,7 @@ export default function HomePage() {
           </li>
           <li>
             Use{" "}
-            <code className="bg-muted px-1 rounded text-xs">GenericForm</code>{" "}
+            <code className="bg-muted px-1 rounded text-xs">DynamicForm</code>{" "}
             to render fields dynamically
           </li>
           <li>Zod schema handles validation and type inference</li>
