@@ -16,8 +16,8 @@ export const PersonSchema = z.object({
       })
     )
     .optional(), // <-- This makes the entire "images" field optional
-  tags: z.array(z.string()).default([]),
-  categories: z.array(z.string()).default([]),
+  tags: z.array(z.string()).optional(),
+  categories: z.array(z.string()).optional(),
 });
 
 export type PersonType = z.infer<typeof PersonSchema>;

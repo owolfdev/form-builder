@@ -42,12 +42,16 @@ export async function createRecord<T extends { id: string }>(
 
   if (Array.isArray(tags) && tags.length > 0 && config.tagRelation) {
     const { table, sourceKey, targetKey } = config.tagRelation;
-    await supabase.from(table).insert(
+    const { error: tagInsertError } = await supabase.from(table).insert(
       tags.map((tagId: string) => ({
         [sourceKey]: recordId,
         [targetKey]: Number(tagId),
       }))
     );
+
+    if (tagInsertError) {
+      console.error("❌ Failed to insert tags:", tagInsertError.message);
+    }
   }
 
   if (
