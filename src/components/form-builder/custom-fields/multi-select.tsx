@@ -41,9 +41,11 @@ export default function MultiSelect<T extends FieldValues>({
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  const filteredOptions = options.filter((option) =>
-    option.name.toLowerCase().includes(inputValue.toLowerCase())
-  );
+  const filteredOptions = options
+    .filter((option) =>
+      option.name.toLowerCase().includes(inputValue.toLowerCase())
+    )
+    .filter((option) => !value.includes(String(option.id)));
 
   console.log("🎯 MultiSelect INIT", { value, options });
 

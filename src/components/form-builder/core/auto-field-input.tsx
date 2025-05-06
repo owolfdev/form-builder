@@ -1,5 +1,4 @@
 // src/components/form-builder/core/auto-field-input.tsx
-
 "use client";
 
 import type { Control, FieldValues, Path } from "react-hook-form";
