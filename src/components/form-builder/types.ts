@@ -8,10 +8,15 @@ export type FieldType =
   | "date"
   | "number";
 
-export type FieldConfig<T> = {
-  name: Path<T>; // ✅ schema-safe
+export type FieldOption = {
+  label: string;
+  value: string;
+};
+
+export type FieldConfig<T = unknown> = {
+  name: T extends object ? Path<T> : string;
   label: string;
   type: FieldType;
   placeholder?: string;
-  options?: { label: string; value: string }[]; // for select
+  options?: FieldOption[];
 };
