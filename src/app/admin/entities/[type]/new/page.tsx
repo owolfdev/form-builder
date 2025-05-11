@@ -8,17 +8,16 @@ import {
   type EntityType,
 } from "@/components/form-builder/entities-config";
 
-export default async function NewEntityPage({
-  params,
-}: {
-  params: { type: string };
-}) {
-  const type = params.type as EntityType;
+type Props = { params: Promise<{ type: string }> };
 
-  if (!entityTypes.includes(type)) return notFound();
+export default async function NewEntityPage({ params }: Props) {
+  const { type } = await params;
+  const entityType = type as EntityType;
 
-  const { fields: rawFields } = entityConfigs[type];
-  const dynamicOptions = await getDynamicOptions(type, rawFields);
+  if (!entityTypes.includes(entityType)) return notFound();
+
+  const { fields: rawFields } = entityConfigs[entityType];
+  const dynamicOptions = await getDynamicOptions(entityType, rawFields);
 
   const fields = rawFields.map((field) =>
     field.fetchFrom
@@ -26,5 +25,5 @@ export default async function NewEntityPage({
       : field
   );
 
-  return <DynamicFormClientWrapper type={type} fields={fields} />;
+  return <DynamicFormClientWrapper type={entityType} fields={fields} />;
 }
