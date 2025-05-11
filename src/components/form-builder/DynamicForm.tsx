@@ -18,6 +18,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 import type { FieldConfig } from "./types";
 import type { Path } from "react-hook-form";
+import ImageUploader from "./custom-fields/image-uploader";
+
 type Props<T extends z.ZodTypeAny> = {
   schema: T;
   fields: FieldConfig<z.infer<T>>[]; // ✅ Pass inferred schema type
@@ -110,6 +112,14 @@ export default function DynamicForm<T extends z.ZodTypeAny>({
                               </option>
                             ))}
                           </select>
+                        );
+                      case "image-multi":
+                        return (
+                          <ImageUploader
+                            value={controller.value}
+                            onChange={controller.onChange}
+                            name={field.name}
+                          />
                         );
                       case "date":
                         return <Input type="date" {...controller} />;

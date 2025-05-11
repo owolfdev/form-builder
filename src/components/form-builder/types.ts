@@ -5,9 +5,10 @@ export type FieldType =
   | "textarea"
   | "checkbox"
   | "select"
-  | "multi-select" // ✅ new
   | "date"
-  | "number";
+  | "number"
+  | "multi-select"
+  | "image-multi"; // ✅ NEW
 
 export type FieldOption = {
   label: string;

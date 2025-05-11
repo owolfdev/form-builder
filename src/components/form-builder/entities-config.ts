@@ -60,12 +60,23 @@ export const entityConfigs: Record<EntityType, EntityConfig> = {
       description: z.string(),
       releaseDate: z.coerce.date(),
       rating: z.coerce.number().min(0).max(10),
+      tags: z.array(z.string()).optional(),
+      images: z
+        .array(
+          z.object({
+            url: z.string().url(),
+            caption: z.string().optional(),
+          })
+        )
+        .optional(),
     }),
     fields: [
       { name: "title", label: "Title", type: "text" },
       { name: "description", label: "Description", type: "text" },
       { name: "releaseDate", label: "Release Date", type: "date" },
       { name: "rating", label: "Rating", type: "number" },
+      { name: "tags", label: "Tags", type: "multi-select", fetchFrom: "tag" },
+      { name: "images", label: "Images", type: "image-multi" }, // ✅ NEW
     ],
   },
   document: {
@@ -75,6 +86,14 @@ export const entityConfigs: Record<EntityType, EntityConfig> = {
       releaseDate: z.coerce.date(),
       rating: z.coerce.number().min(0).max(10),
       tags: z.array(z.string()).optional(),
+      images: z
+        .array(
+          z.object({
+            url: z.string().url(),
+            caption: z.string().optional(),
+          })
+        )
+        .optional(),
     }),
     fields: [
       { name: "title", label: "Title", type: "text" },
@@ -82,6 +101,7 @@ export const entityConfigs: Record<EntityType, EntityConfig> = {
       { name: "releaseDate", label: "Release Date", type: "date" },
       { name: "rating", label: "Rating", type: "number" },
       { name: "tags", label: "Tags", type: "multi-select", fetchFrom: "tag" },
+      { name: "images", label: "Images", type: "image-multi" }, // ✅ NEW
     ],
   },
 };

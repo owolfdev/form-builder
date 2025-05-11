@@ -129,11 +129,11 @@ const SortablePhoto = ({
   );
 };
 
-export default function SbImageUploader({
+export default function ImageUploader({
   value,
   onChange,
   name,
-  bucket = "uploads",
+  bucket = "image-uploader-images",
   multi = true,
 }: SbImageUploaderProps) {
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
