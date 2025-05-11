@@ -12,11 +12,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import MultiSelect from "./custom-fields/multi-select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
 import type { FieldConfig } from "./types";
-
+import type { Path } from "react-hook-form";
 type Props<T extends z.ZodTypeAny> = {
   schema: T;
   fields: FieldConfig<z.infer<T>>[]; // ✅ Pass inferred schema type
@@ -47,7 +48,7 @@ export default function DynamicForm<T extends z.ZodTypeAny>({
           <FormField
             key={field.name}
             control={form.control}
-            name={field.name}
+            name={field.name as Path<z.infer<T>>}
             render={({ field: controller }) => (
               <FormItem>
                 <FormLabel>{field.label}</FormLabel>
@@ -81,6 +82,18 @@ export default function DynamicForm<T extends z.ZodTypeAny>({
                           <Checkbox
                             checked={controller.value}
                             onCheckedChange={controller.onChange}
+                          />
+                        );
+                      case "multi-select":
+                        return (
+                          <MultiSelect
+                            value={controller.value}
+                            onChange={controller.onChange}
+                            options={(field.options ?? []).map((opt) => ({
+                              id: opt.value,
+                              name: opt.label,
+                            }))}
+                            placeholder={field.placeholder}
                           />
                         );
                       case "select":

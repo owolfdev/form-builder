@@ -7,7 +7,13 @@ import type { FieldConfig } from "@/components/form-builder/types";
 import { z } from "zod";
 
 // 1. Define valid entity types
-const entityTypes = ["product", "user", "location", "film"] as const;
+const entityTypes = [
+  "product",
+  "user",
+  "location",
+  "film",
+  "document",
+] as const;
 type EntityType = (typeof entityTypes)[number];
 
 // 2. Define Zod schemas
@@ -32,6 +38,13 @@ const schemas: Record<EntityType, z.ZodTypeAny> = {
     description: z.string(),
     releaseDate: z.coerce.date(),
     rating: z.coerce.number().min(0).max(10),
+  }),
+  document: z.object({
+    title: z.string().min(2),
+    description: z.string(),
+    releaseDate: z.coerce.date(),
+    rating: z.coerce.number().min(0).max(10),
+    tags: z.array(z.string()).optional(),
   }),
 };
 
@@ -67,6 +80,21 @@ const fieldsMap: Record<EntityType, FieldConfig<unknown>[]> = {
     { name: "description", label: "Description", type: "text" },
     { name: "releaseDate", label: "Release Date", type: "date" },
     { name: "rating", label: "Rating", type: "number" },
+  ],
+  document: [
+    { name: "title", label: "Title", type: "text" },
+    { name: "description", label: "Description", type: "text" },
+    { name: "releaseDate", label: "Release Date", type: "date" },
+    { name: "rating", label: "Rating", type: "number" },
+    {
+      name: "tags",
+      label: "Tags",
+      type: "multi-select",
+      options: [
+        { value: "tag1", label: "Tag 1" },
+        { value: "tag2", label: "Tag 2" },
+      ],
+    },
   ],
 };
 

@@ -5,6 +5,7 @@ export type FieldType =
   | "textarea"
   | "checkbox"
   | "select"
+  | "multi-select" // ✅ new
   | "date"
   | "number";
 
@@ -19,4 +20,5 @@ export type FieldConfig<T = unknown> = {
   type: FieldType;
   placeholder?: string;
   options?: FieldOption[];
+  multiple?: boolean;
 };
