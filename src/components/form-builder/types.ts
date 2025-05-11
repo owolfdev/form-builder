@@ -21,4 +21,5 @@ export type FieldConfig<T = unknown> = {
   placeholder?: string;
   options?: FieldOption[];
   multiple?: boolean;
+  fetchFrom?: string;
 };
