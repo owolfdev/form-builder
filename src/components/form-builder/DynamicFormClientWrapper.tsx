@@ -1,5 +1,7 @@
 "use client";
 
+import { toast } from "sonner"; // ✅ Add this
+import { useRouter } from "next/navigation";
 import { entityConfigs } from "./entities-config";
 import DynamicForm from "./DynamicForm";
 import type { EntityType } from "./entities-config";
@@ -13,7 +15,8 @@ export function DynamicFormClientWrapper({
   type: EntityType;
   fields: FieldConfig[];
 }) {
-  const { schema } = entityConfigs[type]; // loaded client-side
+  const router = useRouter(); // ✅ Optional for redirect
+  const { schema } = entityConfigs[type];
 
   return (
     <DynamicForm
@@ -22,12 +25,16 @@ export function DynamicFormClientWrapper({
       defaultValues={{}}
       className="max-w-xl mx-auto px-4 py-20"
       onSubmit={async (data) => {
-        console.log(`📤 Submitting new ${type}:`, data);
         const result = await insertEntity(type, data);
+
         if (result.error) {
-          console.error("❌ Insert failed:", result.error);
+          toast.error("Failed to create entity", {
+            description: result.error,
+          });
         } else {
-          console.log("✅ Insert successful:", result.data);
+          toast.success(`Created new ${type}`);
+          // Optional redirect:
+          router.push(`/${type}`);
         }
       }}
     />
