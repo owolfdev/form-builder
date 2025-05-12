@@ -1,4 +1,3 @@
-// app/admin/entities/[type]/new/page.tsx
 import { notFound } from "next/navigation";
 import { getDynamicOptions } from "@/components/form-builder/actions/get-dynamic-options";
 import { DynamicFormClientWrapper } from "@/components/form-builder/DynamicFormClientWrapper";
@@ -7,6 +6,10 @@ import {
   entityTypes,
   type EntityType,
 } from "@/components/form-builder/entities-config";
+
+function capitalize(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
 
 type Props = { params: Promise<{ type: string }> };
 
@@ -25,5 +28,12 @@ export default async function NewEntityPage({ params }: Props) {
       : field
   );
 
-  return <DynamicFormClientWrapper type={entityType} fields={fields} />;
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">
+        Create new {capitalize(entityType)}
+      </h1>
+      <DynamicFormClientWrapper type={entityType} fields={fields} />
+    </div>
+  );
 }
