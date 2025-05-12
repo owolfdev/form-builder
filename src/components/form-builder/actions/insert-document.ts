@@ -15,16 +15,22 @@ const InsertDocumentSchema = z.object({
       caption: z.string().optional(),
     })
   ),
+  type: z.string().min(1), // <-- Add this line
 });
 
 export async function insertDocument(data: unknown) {
+  console.log("🚀 Incoming data:", data);
+
   const parsed = InsertDocumentSchema.safeParse(data);
+
+  console.log("🚀 Parsed data:", parsed);
 
   if (!parsed.success) {
     return { error: "Validation failed", details: parsed.error.flatten() };
   }
 
   const supabase = await createClient();
+
   const { data: inserted, error } = await supabase
     .from("documents")
     .insert([
@@ -35,6 +41,7 @@ export async function insertDocument(data: unknown) {
         rating: parsed.data.rating,
         tags: parsed.data.tags,
         images: parsed.data.images,
+        type: parsed.data.type, // <-- Add this line
       },
     ])
     .select()

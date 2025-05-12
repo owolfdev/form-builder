@@ -35,9 +35,15 @@ export async function insertEntity<K extends EntityType>(
   const tableName = `form_builder_${type}`;
   const transformed = transformKeys(values);
 
+  // 🔧 Add type explicitly
+  const withType = {
+    ...transformed,
+    type, // use the same string as the entity type (e.g., "document")
+  };
+
   const { data, error } = await supabase
     .from(tableName)
-    .insert([transformed])
+    .insert([withType])
     .select()
     .single();
 
